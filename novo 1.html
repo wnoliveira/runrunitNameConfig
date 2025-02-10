@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gerador de Nomes de Projeto</title>
+  <style>
+    /* Centraliza todo o conteúdo da página */
+    body {
+      text-align: center;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    /* Container do logo */
+    .logo-container {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    .logo-container img {
+      max-height: 70px; /* Ajuste conforme necessidade */
+    }
+
+    /* Título principal */
+    h1 {
+      margin: 0 0 20px 0;
+    }
+
+    /* Container do carregador de CSV */
+    .csv-container {
+      margin-bottom: 20px;
+    }
+    .csv-container label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    /* Formulário de campos na parte de cima, em uma linha que pode quebrar se necessário */
+    .form-container {
+      display: flex;          /* Container em flex (bloco) */
+      flex-wrap: wrap;        /* Permite quebrar de linha se precisar */
+      justify-content: center;/* Centraliza horizontalmente */
+      align-items: center;    /* Alinha verticalmente no centro */
+      margin-bottom: 20px;    /* Espaçamento inferior para separar do botão */
+    }
+
+    /* Cada par (label+input/select) é um "field-group" */
+    .field-group {
+      display: inline-flex;   /* label e input em linha */
+      align-items: center;
+      margin-right: 20px;     /* Espaço à direita de cada grupo */
+      margin-bottom: 10px;    /* Pequeno espaço vertical caso quebre de linha */
+    }
+
+    .field-group label {
+      font-weight: bold;
+      margin-right: 4px; /* Pouco espaço entre label e campo */
+    }
+
+    /* Inputs menores para XX e AA */
+    .small-input {
+      width: 60px;
+      text-align: center;
+    }
+
+    /* Ajuste de tamanho para Descrição e Responsável */
+    #descricao {
+      width: 200px;
+    }
+    #responsavel {
+      width: 120px;
+    }
+
+    /* Botão e resultado ficam em um container próprio, abaixo dos campos */
+    .result-container {
+      display: flex;          /* Também um bloco flex */
+      justify-content: center;/* Centraliza horizontalmente */
+      align-items: center;    /* Alinha no centro verticalmente */
+      gap: 20px;              /* Espaço entre o botão e o texto do resultado */
+      margin-bottom: 30px;    /* Espaço inferior */
+    }
+
+    /* Botão */
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #0057A1;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #003f78;
+    }
+
+    /* Resultado em cor e fonte maior */
+    #resultado {
+      font-size: 1.4em;
+      color: #0057A1; /* tom de azul do logo Inova */
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo central no topo -->
+  <div class="logo-container">
+    <img src="https://www.inova.ind.br/assets/img/logoInova.png" alt="Logo Inova" />
+  </div>
+
+  <h1>Gerador de Nomes de Projeto</h1>
+
+  <!-- Carregador de CSV antes dos campos -->
+  <div class="csv-container">
+    <label for="csvFile">Carregar CSV:</label>
+    <input type="file" id="csvFile" name="csvFile" accept=".csv" />
+  </div>
+
+  <!-- Formulário de dados em linha, cada label+input num "field-group" -->
+  <div class="form-container">
+    <div class="field-group">
+      <label for="xx">Número (XX):</label>
+      <input type="text" id="xx" name="xx" class="small-input" />
+    </div>
+
+    <div class="field-group">
+      <label for="aa">Ano (AA):</label>
+      <input type="text" id="aa" name="aa" class="small-input" />
+    </div>
+
+    <div class="field-group">
+      <label for="descricao">Descrição:</label>
+      <input type="text" id="descricao" name="descricao" />
+    </div>
+
+    <div class="field-group">
+      <label for="tipoSelect">Tipo:</label>
+      <select id="tipoSelect" name="tipoSelect">
+        <option value="">Selecione o Tipo</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label for="objetivoSelect">Objetivo:</label>
+      <select id="objetivoSelect" name="objetivoSelect">
+        <option value="">Selecione o Objetivo</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label for="equipeSelect">Equipe:</label>
+      <select id="equipeSelect" name="equipeSelect">
+        <option value="">Selecione a Equipe</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label for="responsavel">@Resp.:</label>
+      <input type="text" id="responsavel" name="responsavel" />
+    </div>
+  </div>
+
+  <!-- Botão e resultado abaixo dos campos, lado a lado -->
+  <div class="result-container">
+    <button type="button" onclick="gerarNomeProjeto()">Gerar Nome de Projeto</button>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    // Quando a janela carregar, vamos preencher o campo 'aa' com o ano atual (2 dígitos)
+    window.onload = function() {
+      const currentYear = new Date().getFullYear(); // ex: 2025
+      const aaInput = document.getElementById("aa");
+      // Pega só dois dígitos, ex: '25'
+      aaInput.value = String(currentYear).slice(-2);
+    };
+
+    // Leitura do CSV via FileReader
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const csvText = e.target.result;
+        processarCSV(csvText);
+      };
+
+      reader.readAsText(file, 'UTF-8');
+    });
+
+    // Faz o parse do CSV e popula os selects
+    function processarCSV(csvText) {
+      // Quebra em linhas
+      const linhas = csvText.split(/\r?\n/);
+
+      // Remove cabeçalho, assumindo que a primeira linha seja "TIPO,OBJETIVO,EQUIPE"
+      linhas.shift();
+
+      // Limpa selects
+      limparSelect('tipoSelect');
+      limparSelect('objetivoSelect');
+      limparSelect('equipeSelect');
+
+      // Para cada linha
+      linhas.forEach(linha => {
+        if (linha.trim() === '') return; // ignora linhas vazias
+        const [tipo, objetivo, equipe] = linha.split(',');
+        if (!tipo || !objetivo || !equipe) return; // ignora linhas incompletas
+
+        adicionarOpcaoUnica('tipoSelect', tipo.trim());
+        adicionarOpcaoUnica('objetivoSelect', objetivo.trim());
+        adicionarOpcaoUnica('equipeSelect', equipe.trim());
+      });
+    }
+
+    // Adiciona opção sem duplicar
+    function adicionarOpcaoUnica(selectId, valor) {
+      if (!valor) return;
+      const select = document.getElementById(selectId);
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === valor) {
+          return; // já existe
+        }
+      }
+      const option = document.createElement('option');
+      option.value = valor;
+      option.textContent = valor;
+      select.appendChild(option);
+    }
+
+    // Limpa todas as opções de um select, mantendo só a primeira
+    function limparSelect(selectId) {
+      const select = document.getElementById(selectId);
+      select.options.length = 1; // preserva o placeholder
+    }
+
+    // Gera o nome de projeto no formato: XX/AA Descrição [TIPO_OBJETIVO_EQUIPE] @Responsável
+    function gerarNomeProjeto() {
+      const xx = document.getElementById('xx').value.trim();
+      const aa = document.getElementById('aa').value.trim();
+      const descricao = document.getElementById('descricao').value.trim();
+      const tipo = document.getElementById('tipoSelect').value.trim();
+      const objetivo = document.getElementById('objetivoSelect').value.trim();
+      const equipe = document.getElementById('equipeSelect').value.trim();
+      const responsavel = document.getElementById('responsavel').value.trim();
+
+      // Monta [TIPO_OBJETIVO_EQUIPE]
+      const colchetes = `[${tipo}_${objetivo}_${equipe}]`;
+      // Monta o nome final
+      const nomeProjeto = `${xx}/${aa} ${descricao} ${colchetes} @${responsavel}`;
+
+      // Exibe o resultado
+      document.getElementById('resultado').textContent = nomeProjeto;
+    }
+  </script>
+</body>
+</html>
