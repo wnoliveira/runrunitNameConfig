@@ -4,87 +4,68 @@
   <meta charset="UTF-8" />
   <title>Gerador de Nomes de Projeto</title>
   <style>
-    /* Centraliza todo o conteúdo da página */
+    /* Centraliza o conteúdo */
     body {
       text-align: center;
-      margin: 0;
-      font-family: sans-serif;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
     }
 
-    /* Container do logo */
+    /* Logo no topo */
     .logo-container {
       margin-top: 20px;
       margin-bottom: 20px;
     }
     .logo-container img {
-      max-height: 70px; /* Ajuste conforme necessidade */
+      max-height: 70px;
     }
 
-    /* Título principal */
     h1 {
-      margin: 0 0 20px 0;
-    }
-
-    /* Container do carregador de CSV */
-    .csv-container {
+      margin: 0;
       margin-bottom: 20px;
     }
-    .csv-container label {
+
+    /* Cada "linha" do layout (3 linhas) */
+    .line {
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .field-group {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 20px;
+      margin-bottom: 10px;
+    }
+    .field-group label {
       font-weight: bold;
+      margin-right: 5px;
+    }
+
+    select, input {
+      padding: 5px;
       margin-right: 10px;
     }
 
-    /* Formulário de campos na parte de cima, em uma linha que pode quebrar se necessário */
-    .form-container {
-      display: flex;          /* Container em flex (bloco) */
-      flex-wrap: wrap;        /* Permite quebrar de linha se precisar */
-      justify-content: center;/* Centraliza horizontalmente */
-      align-items: center;    /* Alinha verticalmente no centro */
-      margin-bottom: 20px;    /* Espaçamento inferior para separar do botão */
-    }
-
-    /* Cada par (label+input/select) é um "field-group" */
-    .field-group {
-      display: inline-flex;   /* label e input em linha */
-      align-items: center;
-      margin-right: 20px;     /* Espaço à direita de cada grupo */
-      margin-bottom: 10px;    /* Pequeno espaço vertical caso quebre de linha */
-    }
-
-    .field-group label {
-      font-weight: bold;
-      margin-right: 4px; /* Pouco espaço entre label e campo */
-    }
-
-    /* Inputs menores para XX e AA */
+    /* Inputs menores */
     .small-input {
       width: 60px;
       text-align: center;
     }
-
-    /* Ajuste de tamanho para Descrição e Responsável */
     #descricao {
-      width: 200px;
+      width: 180px;
     }
     #responsavel {
       width: 120px;
     }
 
-    /* Botão e resultado ficam em um container próprio, abaixo dos campos */
-    .result-container {
-      display: flex;          /* Também um bloco flex */
-      justify-content: center;/* Centraliza horizontalmente */
-      align-items: center;    /* Alinha no centro verticalmente */
-      gap: 20px;              /* Espaço entre o botão e o texto do resultado */
-      margin-bottom: 30px;    /* Espaço inferior */
-    }
-
     /* Botão */
     button {
       padding: 6px 12px;
-      cursor: pointer;
       font-weight: bold;
-      background: #0057A1;
+      cursor: pointer;
+      background-color: #0057A1;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -93,164 +74,289 @@
       background-color: #003f78;
     }
 
-    /* Resultado em cor e fonte maior */
+    /* Resultado em destaque */
     #resultado {
-      font-size: 1.4em;
-      color: #0057A1; /* tom de azul do logo Inova */
+      font-size: 1.3em;
+      color: #0057A1;
       font-weight: bold;
+      min-width: 200px;
+      text-align: left;
+    }
+
+    /* Oculta as linhas 2 e 3 inicialmente */
+    #line2,
+    #line3 {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <!-- Logo central no topo -->
+
+  <!-- Logo -->
   <div class="logo-container">
     <img src="https://www.inova.ind.br/assets/img/logoInova.png" alt="Logo Inova" />
   </div>
 
   <h1>Gerador de Nomes de Projeto</h1>
 
-  <!-- Carregador de CSV antes dos campos -->
-  <div class="csv-container">
-    <label for="csvFile">Carregar CSV:</label>
-    <input type="file" id="csvFile" name="csvFile" accept=".csv" />
+  <!-- Linha 1: Seleção da equipe -->
+  <div class="line" id="line1">
+    <div class="field-group">
+      <label for="equipesSelect">Equipe:</label>
+      <select id="equipesSelect">
+        <option value="">-- Carregando equipes... --</option>
+      </select>
+    </div>
   </div>
 
-  <!-- Formulário de dados em linha, cada label+input num "field-group" -->
-  <div class="form-container">
+  <!-- Linha 2: Configurações (XX, AA, Descrição, Tipo, Objetivo, Responsável) -->
+  <div class="line" id="line2">
     <div class="field-group">
       <label for="xx">Número (XX):</label>
-      <input type="text" id="xx" name="xx" class="small-input" />
+      <input type="text" id="xx" class="small-input" />
     </div>
 
     <div class="field-group">
       <label for="aa">Ano (AA):</label>
-      <input type="text" id="aa" name="aa" class="small-input" />
+      <input type="text" id="aa" class="small-input" />
     </div>
 
     <div class="field-group">
       <label for="descricao">Descrição:</label>
-      <input type="text" id="descricao" name="descricao" />
+      <input type="text" id="descricao" />
     </div>
 
     <div class="field-group">
       <label for="tipoSelect">Tipo:</label>
-      <select id="tipoSelect" name="tipoSelect">
-        <option value="">Selecione o Tipo</option>
+      <select id="tipoSelect">
+        <option value="">--</option>
       </select>
     </div>
 
     <div class="field-group">
       <label for="objetivoSelect">Objetivo:</label>
-      <select id="objetivoSelect" name="objetivoSelect">
-        <option value="">Selecione o Objetivo</option>
+      <select id="objetivoSelect">
+        <option value="">--</option>
       </select>
     </div>
 
     <div class="field-group">
-      <label for="equipeSelect">Equipe:</label>
-      <select id="equipeSelect" name="equipeSelect">
-        <option value="">Selecione a Equipe</option>
-      </select>
-    </div>
-
-    <div class="field-group">
-      <label for="responsavel">@Resp.:</label>
-      <input type="text" id="responsavel" name="responsavel" />
+      <label for="responsavel">@Responsável:</label>
+      <input type="text" id="responsavel" />
     </div>
   </div>
 
-  <!-- Botão e resultado abaixo dos campos, lado a lado -->
-  <div class="result-container">
-    <button type="button" onclick="gerarNomeProjeto()">Gerar Nome de Projeto</button>
-    <div id="resultado"></div>
+  <!-- Linha 3: Botão + Resultado -->
+  <div class="line" id="line3">
+    <div class="field-group">
+      <button type="button" onclick="gerarNomeProjeto()">Gerar Nome de Projeto</button>
+    </div>
+    <div class="field-group">
+      <div id="resultado"></div>
+    </div>
   </div>
 
   <script>
-    // Quando a janela carregar, vamos preencher o campo 'aa' com o ano atual (2 dígitos)
-    window.onload = function() {
-      const currentYear = new Date().getFullYear(); // ex: 2025
-      const aaInput = document.getElementById("aa");
-      // Pega só dois dígitos, ex: '25'
-      aaInput.value = String(currentYear).slice(-2);
-    };
+    /**
+     * 1) URL base do seu repositório no GitHub, apontando para a branch main,
+     *    onde estão teams.csv e os demais CSVs de cada equipe.
+     */
+    const baseURL = "https://raw.githubusercontent.com/wnoliveira/runrunitNameConfig/main/";
 
-    // Leitura do CSV via FileReader
-    document.getElementById('csvFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        const csvText = e.target.result;
-        processarCSV(csvText);
-      };
-
-      reader.readAsText(file, 'UTF-8');
+    /**
+     * Ao carregar a página, vamos:
+     * - Carregar a lista de equipes de "teams.csv"
+     * - Preencher o campo 'aa' com os últimos 2 dígitos do ano
+     */
+    window.addEventListener('load', () => {
+      carregarListaDeEquipes();
+      const aaInput = document.getElementById('aa');
+      aaInput.value = new Date().getFullYear().toString().slice(-2);
     });
 
-    // Faz o parse do CSV e popula os selects
-    function processarCSV(csvText) {
-      // Quebra em linhas
-      const linhas = csvText.split(/\r?\n/);
+    /**
+     * Faz fetch no teams.csv para popular dinamicamente o <select> "equipesSelect".
+     * Exemplo de teams.csv esperado:
+     *
+     * TEAM_FILE
+     * RAID.csv
+     * SW.csv
+     * FLEX.csv
+     * SMD.csv
+     * TI.csv
+     */
+    function carregarListaDeEquipes() {
+      // Ajustamos o placeholder para mostrar "Carregando..."
+      const equipesSelect = document.getElementById('equipesSelect');
+      equipesSelect.innerHTML = `<option value="">-- Selecione a Equipe --</option>`;
 
-      // Remove cabeçalho, assumindo que a primeira linha seja "TIPO,OBJETIVO,EQUIPE"
-      linhas.shift();
+      fetch(baseURL + "teams.csv")
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Erro ao buscar teams.csv: " + res.status);
+          }
+          return res.text();
+        })
+        .then(csvText => {
+          const linhas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+          // Se a primeira linha for um cabeçalho, remove:
+          if (linhas[0] === "TEAM_FILE") {
+            linhas.shift(); // remove "TEAM_FILE"
+          }
 
-      // Limpa selects
-      limparSelect('tipoSelect');
-      limparSelect('objetivoSelect');
-      limparSelect('equipeSelect');
-
-      // Para cada linha
-      linhas.forEach(linha => {
-        if (linha.trim() === '') return; // ignora linhas vazias
-        const [tipo, objetivo, equipe] = linha.split(',');
-        if (!tipo || !objetivo || !equipe) return; // ignora linhas incompletas
-
-        adicionarOpcaoUnica('tipoSelect', tipo.trim());
-        adicionarOpcaoUnica('objetivoSelect', objetivo.trim());
-        adicionarOpcaoUnica('equipeSelect', equipe.trim());
-      });
+          // Para cada linha (ex: "RAID.csv"), adicionamos uma opção
+          linhas.forEach(nomeArquivo => {
+            adicionarEquipe(nomeArquivo);
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Não foi possível carregar teams.csv. Verifique o console.");
+          // Se falhar, deixamos o select vazio
+          equipesSelect.innerHTML = `<option value="">(Erro ao carregar)</option>`;
+        });
     }
 
-    // Adiciona opção sem duplicar
-    function adicionarOpcaoUnica(selectId, valor) {
-      if (!valor) return;
-      const select = document.getElementById(selectId);
-      for (let i = 0; i < select.options.length; i++) {
-        if (select.options[i].value === valor) {
-          return; // já existe
-        }
+    /**
+     * Cria uma <option> para uma linha do teams.csv, ex: "RAID.csv".
+     * No texto mostramos "RAID"; no value, "RAID.csv".
+     */
+    function adicionarEquipe(arquivoCSV) {
+      if (!arquivoCSV) return;
+      const select = document.getElementById('equipesSelect');
+
+      // Retira ".csv" para exibir somente o nome
+      let nomeEquipe = arquivoCSV;
+      if (arquivoCSV.toLowerCase().endsWith(".csv")) {
+        nomeEquipe = arquivoCSV.slice(0, -4); // remove .csv
       }
+
       const option = document.createElement('option');
-      option.value = valor;
-      option.textContent = valor;
+      option.value = arquivoCSV;
+      option.textContent = nomeEquipe;
       select.appendChild(option);
     }
 
-    // Limpa todas as opções de um select, mantendo só a primeira
-    function limparSelect(selectId) {
-      const select = document.getElementById(selectId);
-      select.options.length = 1; // preserva o placeholder
+    /**
+     * Evento ao mudar a equipe (quando usuário seleciona uma no <select>)
+     */
+    document.getElementById('equipesSelect').addEventListener('change', function() {
+      const arquivoCSV = this.value; // ex: "RAID.csv"
+      if (arquivoCSV) {
+        // Mostra linhas 2 e 3
+        mostrarLinhas2e3(true);
+        // Carrega o CSV daquela equipe (para preencher Tipo e Objetivo)
+        buscarEquipeCSV(arquivoCSV);
+      } else {
+        // Se não selecionou nada, esconde tudo e limpa
+        mostrarLinhas2e3(false);
+        limparSelect('tipoSelect');
+        limparSelect('objetivoSelect');
+      }
+    });
+
+    /**
+     * Faz fetch no CSV da equipe selecionada (por exemplo, "RAID.csv").
+     * Supondo que tenha colunas TIPO,OBJETIVO e cabeçalho "TIPO,OBJETIVO".
+     */
+    function buscarEquipeCSV(nomeArquivo) {
+      const url = baseURL + nomeArquivo;
+      fetch(url)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Erro ao buscar " + nomeArquivo + ": " + res.status);
+          }
+          return res.text();
+        })
+        .then(csvText => {
+          processarEquipeCSV(csvText);
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Não foi possível carregar o CSV da equipe selecionada.");
+          // Se falhar, podemos ocultar as linhas 2 e 3 novamente
+          mostrarLinhas2e3(false);
+        });
     }
 
-    // Gera o nome de projeto no formato: XX/AA Descrição [TIPO_OBJETIVO_EQUIPE] @Responsável
+    /**
+     * Lê o CSV da equipe e popula tipoSelect e objetivoSelect.
+     */
+    function processarEquipeCSV(csvText) {
+      const linhas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+      // Remove a primeira linha (cabeçalho), ex: "TIPO,OBJETIVO"
+      if (linhas.length > 0) {
+        linhas.shift();
+      }
+
+      // Limpa os selects antes de popular
+      limparSelect('tipoSelect');
+      limparSelect('objetivoSelect');
+
+      // Para cada linha, assumimos "TIPO,OBJETIVO"
+      linhas.forEach(linha => {
+        const partes = linha.split(',');
+        if (partes.length < 2) return;
+        const tipo = partes[0].trim();
+        const objetivo = partes[1].trim();
+
+        adicionarOpcaoUnica('tipoSelect', tipo);
+        adicionarOpcaoUnica('objetivoSelect', objetivo);
+      });
+    }
+
+    /**
+     * Adiciona uma opção num <select>, sem duplicar
+     */
+    function adicionarOpcaoUnica(selectId, valor) {
+      if (!valor) return;
+      const sel = document.getElementById(selectId);
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === valor) {
+          return;
+        }
+      }
+      const opt = document.createElement('option');
+      opt.value = valor;
+      opt.textContent = valor;
+      sel.appendChild(opt);
+    }
+
+    /**
+     * Limpa todas as opções de um <select>, deixando somente a primeira (--)
+     */
+    function limparSelect(selectId) {
+      const sel = document.getElementById(selectId);
+      sel.options.length = 1; // preserve a option 0
+    }
+
+    /**
+     * Mostra ou esconde as linhas 2 e 3
+     */
+    function mostrarLinhas2e3(acao) {
+      document.getElementById('line2').style.display = acao ? 'flex' : 'none';
+      document.getElementById('line3').style.display = acao ? 'flex' : 'none';
+    }
+
+    /**
+     * Monta o nome do projeto: XX/AA Descrição [TIPO_OBJETIVO_EQUIPE] @Responsável
+     */
     function gerarNomeProjeto() {
       const xx = document.getElementById('xx').value.trim();
       const aa = document.getElementById('aa').value.trim();
       const descricao = document.getElementById('descricao').value.trim();
       const tipo = document.getElementById('tipoSelect').value.trim();
       const objetivo = document.getElementById('objetivoSelect').value.trim();
-      const equipe = document.getElementById('equipeSelect').value.trim();
+
+      // O texto exibido no select de equipe é, por exemplo, "RAID"
+      const nomeEquipe = document.getElementById('equipesSelect').selectedOptions[0]?.text;
+
       const responsavel = document.getElementById('responsavel').value.trim();
 
       // Monta [TIPO_OBJETIVO_EQUIPE]
-      const colchetes = `[${tipo}_${objetivo}_${equipe}]`;
-      // Monta o nome final
+      const colchetes = `[${tipo}_${objetivo}_${nomeEquipe}]`;
       const nomeProjeto = `${xx}/${aa} ${descricao} ${colchetes} @${responsavel}`;
 
-      // Exibe o resultado
       document.getElementById('resultado').textContent = nomeProjeto;
     }
   </script>
